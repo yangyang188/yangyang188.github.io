@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="洋洋的小站" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="说明Scrapy爬虫案例-淘宝比价定向爬虫学习笔记">
+<meta name="keywords" content="Scrapy爬虫案例学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapy爬虫案例-淘宝比价定向爬虫">
+<meta property="og:url" content="https:&#x2F;&#x2F;zhihuya188.github.io&#x2F;archives&#x2F;aca0cfdd&#x2F;index.html">
+<meta property="og:site_name" content="洋洋的小站">
+<meta property="og:description" content="说明Scrapy爬虫案例-淘宝比价定向爬虫学习笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-27T13:50:10.802Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://zhihuya188.github.io/archives/aca0cfdd/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Scrapy爬虫案例-淘宝比价定向爬虫 | 洋洋的小站</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">洋洋的小站</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">洋洋的个人博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-top">
+
+    <a href="/top/" rel="section"><i class="fa fa-fw fa-signal"></i>排行榜</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">17</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜索..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/zhihuya188" class="github-corner" title="GitHub" aria-label="GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhihuya188.github.io/archives/aca0cfdd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="洋洋">
+      <meta itemprop="description" content="人生苦短我用python。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="洋洋的小站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Scrapy爬虫案例-淘宝比价定向爬虫
+        </h2>
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-11 09:13:23" itemprop="dateCreated datePublished" datetime="2019-08-11T09:13:23+08:00">2019-08-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-27 21:50:10" itemprop="dateModified" datetime="2019-10-27T21:50:10+08:00">2019-10-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%93%E4%B8%9A/" itemprop="url" rel="index">
+                    <span itemprop="name">专业</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%93%E4%B8%9A/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%93%E4%B8%9A/python/scrapy/" itemprop="url" rel="index">
+                    <span itemprop="name">scrapy</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span id="/archives/aca0cfdd/" class="post-meta-item leancloud_visitors" data-flag-title="Scrapy爬虫案例-淘宝比价定向爬虫" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.6k</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h1><p>Scrapy爬虫案例-淘宝比价定向爬虫学习笔记<br><a id="more"></a></p>
+<blockquote>
+<p>学习教程：Python网络爬虫与信息提取 \<br>授课老师：嵩天 \<br>官方网站：<a href="https://python123.io" target="_blank" rel="external nofollow noopener noreferrer">https://python123.io</a> \<br>教程链接：<a href="https://python123.io/index/courses/804" target="_blank" rel="external nofollow noopener noreferrer">https://python123.io/index/courses/804</a></p>
+</blockquote>
+<h2 id="“淘宝比价定向爬虫”实例"><a href="#“淘宝比价定向爬虫”实例" class="headerlink" title="“淘宝比价定向爬虫”实例"></a>“淘宝比价定向爬虫”实例</h2><h3 id="功能描述"><a href="#功能描述" class="headerlink" title="功能描述"></a>功能描述</h3><p>目标：获取淘宝搜索页面的信息，提取其中的商品名称和价格</p>
+<p>理解：</p>
+<ul>
+<li>淘宝的搜索接口</li>
+<li>翻页的处理</li>
+<li>技术路线：requests‐bs4‐re</li>
+</ul>
+<p>关键词：”蕾丝裙”</p>
+<figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://s.taobao.com/search?q=<span class="name">%E8</span>%95<span class="name">%BE</span><span class="name">%E4</span><span class="name">%B8</span>%9D<span class="name">%E8</span><span class="name">%A3</span>%99<span class="variable">&amp;js</span>=1<span class="variable">&amp;stats_click</span>=search_radio_all%3A1<span class="variable">&amp;initiative_id</span>=staobaoz_20170105<span class="variable">&amp;ie</span>=utf8<span class="variable">&amp;bcoffset</span>=0<span class="variable">&amp;ntoffset</span>=6<span class="variable">&amp;p4ppushleft</span>=1%2C48<span class="variable">&amp;s</span>=1</span><br><span class="line">https://s.taobao.com/search?q=<span class="name">%E8</span>%95<span class="name">%BE</span><span class="name">%E4</span><span class="name">%B8</span>%9D<span class="name">%E8</span><span class="name">%A3</span>%99<span class="variable">&amp;js</span>=1<span class="variable">&amp;stats_click</span>=search_radio_all%3A1<span class="variable">&amp;initiative_id</span>=staobaoz_20170105<span class="variable">&amp;ie</span>=utf8<span class="variable">&amp;bcoffset</span>=0<span class="variable">&amp;ntoffset</span>=6<span class="variable">&amp;p4ppushleft</span>=1%2C48<span class="variable">&amp;s</span>=44</span><br><span class="line">https://s.taobao.com/search?q=<span class="name">%E8</span>%95<span class="name">%BE</span><span class="name">%E4</span><span class="name">%B8</span>%9D<span class="name">%E8</span><span class="name">%A3</span>%99<span class="variable">&amp;js</span>=1<span class="variable">&amp;stats_click</span>=search_radio_all%3A1<span class="variable">&amp;initiative_id</span>=staobaoz_20170105<span class="variable">&amp;ie</span>=utf8<span class="variable">&amp;bcoffset</span>=0<span class="variable">&amp;ntoffset</span>=6<span class="variable">&amp;p4ppushleft</span>=1%2C48<span class="variable">&amp;s</span>=88</span><br></pre></td></tr></table></figure>
+<p>每页44个商品 </p>
+<p>搜索接口和翻页的URL对应属性</p>
+<h3 id="定向爬虫的可行性"><a href="#定向爬虫的可行性" class="headerlink" title="定向爬虫的可行性"></a>定向爬虫的可行性</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">https:</span><span class="comment">//s.taobao.com/robots.txt</span></span><br><span class="line">User‐<span class="string">agent:</span> *</span><br><span class="line"><span class="string">Disallow:</span> /</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>请注意：这个例子仅探讨技术实现，请不要不加限制的爬取该网站</p>
+</blockquote>
+<h3 id="程序的结构设计"><a href="#程序的结构设计" class="headerlink" title="程序的结构设计"></a>程序的结构设计</h3><p>步骤1：提交商品搜索请求，循环获取页面</p>
+<p>步骤2：对于每个页面，提取商品名称和价格信息</p>
+<p>步骤3：将信息保存到txt</p>
+<h3 id="实例编写"><a href="#实例编写" class="headerlink" title="实例编写"></a>实例编写</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># coding=utf-8</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">项目描述：获取淘宝搜索页面的信息，提取其中的商品名称和价格</span></span><br><span class="line"><span class="string">运行环境：win7 64 + python3.7 </span></span><br><span class="line"><span class="string">三方库：fake_useragent</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">代码详解：https://yangyang188.coding.me/</span></span><br><span class="line"><span class="string">文件: TaobaoSpider.py</span></span><br><span class="line"><span class="string">创建时间：2019/8/11 9:21</span></span><br><span class="line"><span class="string">创建者：yangyang</span></span><br><span class="line"><span class="string">博客: yangyang188.coding.me</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">from</span> fake_useragent <span class="keyword">import</span> UserAgent</span><br><span class="line"><span class="comment"># 设置随机ua</span></span><br><span class="line">ua = UserAgent()</span><br><span class="line">headers = &#123;<span class="string">'User-Agent'</span>: ua.random,</span><br><span class="line">           <span class="string">'cookie'</span>: <span class="string">'***'</span></span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getHTMLText</span><span class="params">(url)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        r = requests.get(url, timeout=<span class="number">30</span>, headers=headers)</span><br><span class="line">        r.raise_for_status()</span><br><span class="line">        r.encoding = r.apparent_encoding</span><br><span class="line">        <span class="keyword">return</span> r.text</span><br><span class="line">    <span class="keyword">except</span> BaseException:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parsePage</span><span class="params">(ilt, html)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        plt = re.findall(<span class="string">r'\"view_price\"\:\"[\d\.]*\"'</span>, html)</span><br><span class="line">        tlt = re.findall(<span class="string">r'\"raw_title\"\:\".*?\"'</span>, html)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(plt)):</span><br><span class="line">            <span class="comment"># eval去除最外层的""</span></span><br><span class="line">            price = eval(plt[i].split(<span class="string">':'</span>)[<span class="number">1</span>])</span><br><span class="line">            title = eval(tlt[i].split(<span class="string">':'</span>)[<span class="number">1</span>])</span><br><span class="line">            ilt.append([price, title])</span><br><span class="line">    <span class="keyword">except</span> BaseException:</span><br><span class="line">        print(<span class="string">"异常"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">printGoodsList</span><span class="params">(ilt)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'淘宝.txt'</span>, <span class="string">'w'</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        tplt = <span class="string">"&#123;:4&#125;\t&#123;:8&#125;\t&#123;:16&#125;\n"</span></span><br><span class="line">        f.write(tplt.format(<span class="string">"序号"</span>, <span class="string">"价格"</span>, <span class="string">"商品名称"</span>))</span><br><span class="line">        count = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> g <span class="keyword">in</span> ilt:</span><br><span class="line">            count = count + <span class="number">1</span></span><br><span class="line">            f.write(tplt.format(count, g[<span class="number">0</span>], g[<span class="number">1</span>]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># tplt = "&#123;:4&#125;\t&#123;:8&#125;\t&#123;:16&#125;"</span></span><br><span class="line">    <span class="comment"># print(tplt.format("序号", "价格", "商品名称"))</span></span><br><span class="line">    <span class="comment"># count = 0</span></span><br><span class="line">    <span class="comment"># for g in ilt:</span></span><br><span class="line">    <span class="comment">#     count = count + 1</span></span><br><span class="line">    <span class="comment">#     print(tplt.format(count, g[0], g[1]))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    goods = <span class="string">'蕾丝裙'</span></span><br><span class="line">    depth = <span class="number">2</span></span><br><span class="line">    start_url = <span class="string">'https://s.taobao.com/search?q='</span> + goods</span><br><span class="line">    infoList = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(depth):</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            url = start_url + <span class="string">'&amp;s='</span> + str(<span class="number">44</span> * i)</span><br><span class="line">            html = getHTMLText(url)</span><br><span class="line">            parsePage(infoList, html)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">except</span> BaseException:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">    printGoodsList(infoList)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">序号  	价格      	商品名称            </span><br><span class="line">   <span class="number">1</span>	<span class="number">99.00</span>   	中长款黑色蕾丝裙鱼尾包臀裙半身裙女秋季</span><br><span class="line">   <span class="number">2</span>	<span class="number">128.00</span>  	裙子女夏季<span class="number">2019</span>新款水溶蕾丝半身裙a字裙鱼尾裙中长款高腰包臀裙</span><br><span class="line">   <span class="number">3</span>	<span class="number">94.00</span>   	凯莉欧原创<span class="number">2019</span>夏季新款绣花网纱拼接蕾丝木耳花边连衣裙女</span><br><span class="line">   <span class="number">4</span>	<span class="number">299.50</span>  	ONLY2019秋季新款chic气质蕾丝修身收腰百褶连衣裙女|<span class="number">119107650</span></span><br><span class="line">   <span class="number">5</span>	<span class="number">349.50</span>  	ONLY2019秋季新款名媛气质蕾丝中长款连衣裙收腰显瘦女|<span class="number">119207582</span></span><br><span class="line">   <span class="number">6</span>	<span class="number">199.00</span>  	茵曼旗舰店小清新裙子夏连衣裙女裙<span class="number">2019</span>新款女装蕾丝复古收腰长裙</span><br><span class="line">   <span class="number">7</span>	<span class="number">382.70</span>  	罗衣短袖连衣裙女<span class="number">2019</span>夏装新款优雅蕾丝修身包臀雾蓝色裙子<span class="number">00079</span></span><br><span class="line">   <span class="number">8</span>	<span class="number">385.70</span>  	罗衣原创蕾丝连衣裙<span class="number">2019</span>春夏新款气质雾蓝色修身淑女中长裙子<span class="number">7108</span></span><br><span class="line">   <span class="number">9</span>	<span class="number">259.00</span>  	茵曼旗舰店长裙女连衣裙长款<span class="number">2019</span>夏装新款纯棉复古蕾丝很仙的裙子</span><br><span class="line">  <span class="number">10</span>	<span class="number">399.00</span>  	Vero Moda2019春季新款ins风蕾丝七分袖印花连衣裙|<span class="number">31917</span>C549</span><br><span class="line">  <span class="number">11</span>	<span class="number">499.00</span>  	智熏裙法式桔梗裙<span class="number">2019</span>新款夏装新款很仙的蕾丝网纱法国小众连衣裙</span><br><span class="line">  <span class="number">12</span>	<span class="number">188.00</span>  	<span class="number">2019</span>流行裙子新款夏女韩版显瘦遮肚蕾丝连衣裙仙女超仙甜美小黑裙</span><br><span class="line">  <span class="number">13</span>	<span class="number">388.00</span>  	蕾丝连衣裙女<span class="number">2019</span>夏新款法国小众气质显瘦中长款无袖打底背心裙子</span><br><span class="line">  <span class="number">14</span>	<span class="number">185.00</span>  	法国小众很仙的小个子蕾丝连衣裙<span class="number">2019</span>新款夏甜美裙子仙女超仙森系</span><br><span class="line">  <span class="number">15</span>	<span class="number">388.00</span>  	<span class="number">2019</span>夏装新款流行裙子夏很仙的法国小众蕾丝连衣裙女中长款仙女裙</span><br><span class="line">  <span class="number">16</span>	<span class="number">799.00</span>  	Vero Moda2019秋季新款蕾丝面料五分袖V领连衣裙|<span class="number">31936</span>Z513</span><br><span class="line">  <span class="number">17</span>	<span class="number">389.00</span>  	网纱蕾丝裙子<span class="number">2019</span>气质宽松小个子娃娃款刺绣超仙女白色连衣裙</span><br><span class="line">  <span class="number">18</span>	<span class="number">399.00</span>  	ZARA  <span class="number">2019</span>新款 女装 珠宝纽扣饰蕾丝连衣裙<span class="number">04786061251</span></span><br><span class="line">  <span class="number">19</span>	<span class="number">398.00</span>  	SitiV领智熏法式蕾丝连衣裙七分袖修身小众A字中长气质高端复古夏</span><br><span class="line">  <span class="number">20</span>	<span class="number">339.00</span>  	伊芙丽鱼尾裙女裙子<span class="number">2019</span>秋装新款A字裙中长款蕾丝裙黑色半身裙女</span><br><span class="line">  <span class="number">21</span>	<span class="number">398.00</span>  	秋水伊人法式蕾丝连衣裙<span class="number">2019</span>新款夏装女eggsshop丧系裙子森系超仙</span><br><span class="line">  <span class="number">22</span>	<span class="number">757.00</span>  	JUZUI/玖姿官方旗舰店<span class="number">2019</span>夏季新款气质蕾丝拼接时尚中长连衣裙女</span><br><span class="line">  <span class="number">23</span>	<span class="number">1893.00</span> 	sandro2019春夏新款女装蕾丝镂空凸花中长连衣裙R20656E</span><br><span class="line">  <span class="number">24</span>	<span class="number">1430.00</span> 	sandro2019春夏新款女装浪漫蕾丝连衣裙R20680E</span><br><span class="line">  <span class="number">25</span>	<span class="number">148.00</span>  	纯棉连衣裙女流行夏装<span class="number">2019</span>新款妈妈纯棉蕾丝短袖休闲气质显瘦裙子</span><br><span class="line">  <span class="number">26</span>	<span class="number">782.00</span>  	JUZUI/玖姿官方旗舰店女装<span class="number">2019</span>夏季新款短袖蕾丝印花中长连衣裙女</span><br><span class="line">  <span class="number">27</span>	<span class="number">988.00</span>  	DAZZLE地素 <span class="number">2019</span>夏装新款纯色镂空装饰水溶蕾丝半身裙女<span class="number">2</span>G2S2347B</span><br><span class="line">  <span class="number">28</span>	<span class="number">169.00</span>  	黑色半身裙女<span class="number">2019</span>夏新款a字裙子中长款高腰网纱百褶学生蛋糕裙秋</span><br><span class="line">  <span class="number">29</span>	<span class="number">1399.00</span> 	商场同款DOUBLOVE贝爱<span class="number">2019</span>春夏新款蕾丝连衣裙星星刺绣通透雅致</span><br><span class="line">  <span class="number">30</span>	<span class="number">1098.00</span> 	真丝连衣裙<span class="number">2019</span>新款夏季女桑蚕丝高端时尚奢华大牌蕾丝白色裙子</span><br><span class="line">  <span class="number">31</span>	<span class="number">1086.00</span> 	SNIDEL2019春夏新品 甜美蕾丝钩花镂空鱼尾包中长半裙SWFS191137</span><br><span class="line">  <span class="number">32</span>	<span class="number">169.00</span>  	蕾丝连衣裙性感一字肩仙女超仙甜美沙滩裙子<span class="number">2019</span>流行夏天海边度假</span><br><span class="line">  <span class="number">33</span>	<span class="number">1128.00</span> 	朗姿 裙子女<span class="number">2019</span>夏装新款A字裙高腰修身V领条纹短袖蕾丝连衣裙女</span><br><span class="line">  <span class="number">34</span>	<span class="number">428.00</span>  	三彩<span class="number">2019</span>夏季新款蕾丝雪纺连衣裙短袖假两件仙女流行蛋糕长裙子女</span><br><span class="line">  <span class="number">35</span>	<span class="number">1518.00</span> 	DAZZLE地素 秋装新款性感花纹收绳斜襟蕾丝连衣裙女<span class="number">2</span>F3O4067T</span><br><span class="line">  <span class="number">36</span>	<span class="number">1428.00</span> 	YINER音儿女装<span class="number">2019</span>夏季新款薄款蕾丝花边拼接喇叭袖收腰连衣裙</span><br><span class="line">  <span class="number">37</span>	<span class="number">218.00</span>  	阔太太连衣裙两件套<span class="number">2019</span>新款夏季蕾丝披肩中长款显瘦气质过膝裙子</span><br><span class="line">  <span class="number">38</span>	<span class="number">339.90</span>  	阿卡雪纺连衣裙女<span class="number">2019</span>夏新款蕾丝流行裙子收腰显瘦超仙甜美仙女裙</span><br><span class="line">  <span class="number">39</span>	<span class="number">685.00</span>  	【商场同款】太平鸟女装<span class="number">2019</span>夏装新黑色蕾丝收腰连衣裙 A5FA92350</span><br><span class="line">  <span class="number">40</span>	<span class="number">79.00</span>   	白色蕾丝半身裙女夏一步裙新款高腰显瘦中长款包臀a字半身长裙子</span><br><span class="line">  <span class="number">41</span>	<span class="number">830.00</span>  	SNIDEL2019春夏新品复古宫廷风荷叶边蕾丝全棉连衣裙SWFO191038</span><br><span class="line">  <span class="number">42</span>	<span class="number">499.00</span>  	Five Plus2019新款女夏装蕾丝连衣裙短袖V领荷叶边长裙子高腰镂空</span><br><span class="line">  <span class="number">43</span>	<span class="number">764.00</span>  	ochirly 欧时力<span class="number">2019</span>新款夏装带蕾丝连衣裙女<span class="number">1</span>ZH2084160</span><br><span class="line">  <span class="number">44</span>	<span class="number">1590.00</span> 	dzzit地素 <span class="number">2019</span>秋专柜新款淑女千层蕾丝绣花连衣裙女<span class="number">3</span>G3O506</span><br><span class="line">  <span class="number">45</span>	<span class="number">1345.00</span> 	Miss Sixty2019新款秋季设计感荷叶边修身蕾丝很仙的连衣裙女</span><br><span class="line">  <span class="number">46</span>	<span class="number">708.00</span>  	YINER音儿女装<span class="number">2019</span>夏季新款纯色时尚蕾丝花边拼接包臀鱼尾半身裙</span><br><span class="line">  <span class="number">47</span>	<span class="number">199.00</span>  	诗凡黎很仙的纱裙女蕾丝<span class="number">2019</span>新款中长款高腰雪纺a字裙女半身裙</span><br><span class="line">  <span class="number">48</span>	<span class="number">1396.00</span> 	影儿诗篇女装<span class="number">2019</span>秋季新款撞色丝绒织带钉珠蕾丝网纱连衣裙</span><br><span class="line">  <span class="number">49</span>	<span class="number">389.00</span>  	网纱蕾丝裙子<span class="number">2019</span>气质宽松小个子娃娃款刺绣超仙女白色连衣裙</span><br><span class="line">  <span class="number">50</span>	<span class="number">528.00</span>  	<span class="number">2019</span>夏季新款女装大牌欧美时尚黑色蕾丝裙子长款真丝桑蚕丝连衣裙</span><br><span class="line">  <span class="number">51</span>	<span class="number">299.00</span>  	ONLY2019秋季新款领口系带气质名媛蕾丝修身连衣裙女|<span class="number">119161530</span></span><br><span class="line">  <span class="number">52</span>	<span class="number">399.00</span>  	IVENI/依维妮<span class="number">2019</span>新款洋气蕾丝网纱长款过膝堆堆蛋糕裙连衣裙女潮</span><br><span class="line">  <span class="number">53</span>	<span class="number">399.50</span>  	ONLY2019秋季新款气质一字肩蕾丝百褶收腰连衣裙女|<span class="number">119161511</span></span><br><span class="line">  <span class="number">54</span>	<span class="number">1968.00</span> 	影儿YINER音儿女装<span class="number">2019</span>秋季新款蕾丝拼接两件套连衣裙<span class="number">8</span>C69305636</span><br><span class="line">  <span class="number">55</span>	<span class="number">499.50</span>  	Vero Moda2019夏季新款宴会礼服丝滑里衬收腰蕾丝连衣裙<span class="number">31927</span>B568</span><br><span class="line">  <span class="number">56</span>	<span class="number">299.50</span>  	ONLY2019秋季新款桔梗领口气质蕾丝套装雪纺连衣裙女|<span class="number">119107609</span></span><br><span class="line">  <span class="number">57</span>	<span class="number">559.00</span>  	Five Plus2019新款女夏装蕾丝连衣裙女高腰蝴蝶结短裙子荷叶花边</span><br><span class="line">  <span class="number">58</span>	<span class="number">1728.00</span> 	YINER音儿女装<span class="number">2019</span>秋新款优雅蕾丝花边拼接花朵装饰旗袍连衣裙</span><br><span class="line">  <span class="number">59</span>	<span class="number">499.00</span>  	智熏裙法式桔梗裙<span class="number">2019</span>新款夏装新款很仙的蕾丝网纱法国小众连衣裙</span><br><span class="line">  <span class="number">60</span>	<span class="number">299.50</span>  	ONLY2019秋季新款chic气质蕾丝修身收腰百褶连衣裙女|<span class="number">119107650</span></span><br><span class="line">  <span class="number">61</span>	<span class="number">1277.00</span> 	JUZUI/玖姿官方旗舰店<span class="number">2019</span>夏季新款蕾丝拼接收腰显瘦中长连衣裙女</span><br><span class="line">  <span class="number">62</span>	<span class="number">259.00</span>  	ZARA 新款 女装 凸纹蕾丝短连衣裙 <span class="number">04387223800</span></span><br><span class="line">  <span class="number">63</span>	<span class="number">299.00</span>  	ZARA新款 女装 凸纹蕾丝装饰小打褶连衣裙 <span class="number">05598226942</span></span><br><span class="line">  <span class="number">64</span>	<span class="number">299.90</span>  	蕾丝拼接连衣裙女夏装<span class="number">2019</span>新款很仙的法国小众裙子女复古雪纺裙</span><br><span class="line">  <span class="number">65</span>	<span class="number">668.00</span>  	DAZZLE 地素 夏装新款 蕾丝镂空刺绣花高腰吊带连衣裙薄 <span class="number">2</span>A2O331</span><br><span class="line">  <span class="number">66</span>	<span class="number">148.00</span>  	纯棉连衣裙女流行夏装<span class="number">2019</span>新款妈妈纯棉蕾丝短袖休闲气质显瘦裙子</span><br><span class="line">  <span class="number">67</span>	<span class="number">179.90</span>  	乐町浪漫中长款裙子<span class="number">2019</span>夏季新款蕾丝显瘦ins超火的半身a字纱裙女</span><br><span class="line">  <span class="number">68</span>	<span class="number">2153.00</span> 	sandro2019春夏新款女装 撞色蕾丝领连衣裙 R20499E</span><br><span class="line">  <span class="number">69</span>	<span class="number">558.00</span>  	欧洲站明星同款女装<span class="number">2019</span>新款时尚气质小香风修身白色蕾丝连衣裙夏</span><br><span class="line">  <span class="number">70</span>	<span class="number">268.00</span>  	潘南奎 隐秘型性感 设计感蕾丝不规则连衣裙女无袖收腰气质小黑裙</span><br><span class="line">  <span class="number">71</span>	<span class="number">649.00</span>  	ONLY2019秋季新款仙女蕾丝网纱收腰连衣裙女|<span class="number">119307528</span></span><br><span class="line">  <span class="number">72</span>	<span class="number">1430.00</span> 	sandro2019春夏新款女装浪漫蕾丝连衣裙R20680E</span><br><span class="line">  <span class="number">73</span>	<span class="number">1368.00</span> 	YINER音儿女装<span class="number">2019</span>夏季新款圆点娃娃领镂空蕾丝收腰连衣裙</span><br><span class="line">  <span class="number">74</span>	<span class="number">188.00</span>  	<span class="number">2019</span>流行裙子新款夏女韩版显瘦遮肚蕾丝连衣裙仙女超仙甜美小黑裙</span><br><span class="line">  <span class="number">75</span>	<span class="number">149.00</span>  	欧洲站<span class="number">2019</span>夏装新款宽松显瘦时尚蕾丝拼接连衣裙女胖mm鱼尾裙子潮</span><br><span class="line">  <span class="number">76</span>	<span class="number">298.00</span>  	初恋女长裙微胖显瘦<span class="number">2019</span>夏装喇叭袖蕾丝拼接印花雪纺大码mm连衣裙</span><br><span class="line">  <span class="number">77</span>	<span class="number">79.00</span>   	白色蕾丝半身裙女夏一步裙新款高腰显瘦中长款包臀a字半身长裙子</span><br><span class="line">  <span class="number">78</span>	<span class="number">1488.00</span> 	YINER音儿女装<span class="number">2019</span>秋季新款衬衫领纽扣拼接钩花镂空蕾丝连衣裙</span><br><span class="line">  <span class="number">79</span>	<span class="number">649.00</span>  	ONLY2019秋季新款仙女透视蕾丝松紧收腰网纱连衣裙女|<span class="number">119207578</span></span><br><span class="line">  <span class="number">80</span>	<span class="number">218.00</span>  	两件套连衣裙女夏季<span class="number">2019</span>新款流行气质中长款蕾丝披肩雪纺套装裙子</span><br><span class="line">  <span class="number">81</span>	<span class="number">849.00</span>  	Vero Moda2019春季新款蕾丝拼接面料圆领连衣裙|<span class="number">31917</span>B504</span><br><span class="line">  <span class="number">82</span>	<span class="number">1098.00</span> 	珂莱蒂尔蕾丝连衣裙<span class="number">2019</span>秋季新款超仙甜美法式高腰显瘦短袖裙子女</span><br><span class="line">  <span class="number">83</span>	<span class="number">148.00</span>  	于momo民国大小姐复古风连衣裙斜门襟超仙气质收腰旗袍蕾丝裙</span><br><span class="line">  <span class="number">84</span>	<span class="number">1893.00</span> 	sandro2019春夏新款女装蕾丝镂空凸花中长连衣裙R20656E</span><br><span class="line">  <span class="number">85</span>	<span class="number">1548.00</span> 	YINER音儿女装<span class="number">2019</span>夏季新款中国风钩花蕾丝拼接旗袍领收腰连衣裙</span><br><span class="line">  <span class="number">86</span>	<span class="number">1718.00</span> 	珂莱蒂尔蕾丝旗袍连衣裙<span class="number">2019</span>秋季新款气质时尚刺绣花收腰显瘦裙子</span><br><span class="line">  <span class="number">87</span>	<span class="number">168.00</span>  	蕾丝连衣裙<span class="number">2019</span>新款夏韩版显瘦小黑裙长裙气质收腰网纱流行裙子女</span><br><span class="line">  <span class="number">88</span>	<span class="number">615.12</span>  	SELECTED思莱德秋季新品撞色蕾丝拼接女士修身连衣裙S|<span class="number">41932</span>J516</span><br><span class="line">  <span class="number">89</span>	<span class="number">349.00</span>  	ONLY2019秋季新款桔梗喇叭袖蕾丝雪纺连衣裙中长款女|<span class="number">119107681</span></span><br><span class="line">  <span class="number">90</span>	<span class="number">259.90</span>  	乐町蕾丝拼接连衣裙<span class="number">2019</span>夏装新款超仙甜美很仙的法国小众雪纺裙子</span><br><span class="line">  <span class="number">91</span>	<span class="number">688.00</span>  	<span class="number">19</span>妻子的浪漫旅行明星章子怡baby杨颖同款蕾丝镂空度假长款连衣裙</span><br><span class="line">  <span class="number">92</span>	<span class="number">799.00</span>  	宋慧乔明星同款<span class="number">2019</span>新款夏收腰显瘦气质裙子女流行白色蕾丝连衣裙</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+    <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:18px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+        
+    </div>
+      
+<div class="note primary">
+    <div class="popular-posts-header">相关文章推荐</div>
+    <ul class="popular-posts">
+        <li class="popular-posts-item">
+          <div class="popular-posts-title"><a href="\archives\9a596e53\" rel="bookmark">Scrapy爬虫案例-“图片下载”实例</a></div>
+        </li>
+    </ul>
+</div>
+      
+        <div class="reward-container">
+  <div>谢谢您请我吃糖果</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="洋洋 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>洋洋
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://zhihuya188.github.io/archives/aca0cfdd/" title="Scrapy爬虫案例-淘宝比价定向爬虫">https://zhihuya188.github.io/archives/aca0cfdd/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/scrapy/" rel="tag"><i class="fa fa-tag"></i> scrapy</a>
+              <a href="/tags/spider/" rel="tag"><i class="fa fa-tag"></i> spider</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/archives/4d89c206/" rel="next" title="Requests库学习笔记">
+                  <i class="fa fa-chevron-left"></i> Requests库学习笔记
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/archives/9a596e53/" rel="prev" title="Scrapy爬虫案例-“图片下载”实例">
+                  Scrapy爬虫案例-“图片下载”实例 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#说明"><span class="nav-text">说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#“淘宝比价定向爬虫”实例"><span class="nav-text">“淘宝比价定向爬虫”实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#功能描述"><span class="nav-text">功能描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定向爬虫的可行性"><span class="nav-text">定向爬虫的可行性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#程序的结构设计"><span class="nav-text">程序的结构设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例编写"><span class="nav-text">实例编写</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+<a href="/">
+  <img class="site-author-image" itemprop="image" alt="洋洋" src="/images/avatar.jpg">
+  </a>
+  <p class="site-author-name" itemprop="name">洋洋</p>
+  <div class="site-description" itemprop="description">人生苦短我用python。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhihuya188" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;zhihuya188" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="external nofollow noopener noreferrer" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">洋洋</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">74k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:07</span>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/moment.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment-precise-range-plugin@1.3.0/moment-precise-range.min.js"></script>
+  <script>
+    function timer() {
+      var ages = moment.preciseDiff(moment(),moment(20191029,"YYYYMMDD"));
+      ages = ages.replace(/years?/, "年");
+      ages = ages.replace(/months?/, "月");
+      ages = ages.replace(/days?/, "天");
+      ages = ages.replace(/hours?/, "小时");
+      ages = ages.replace(/minutes?/, "分");
+      ages = ages.replace(/seconds?/, "秒");
+      ages = ages.replace(/\d+/g, '<span style="color:#1890ff">$&</span>');
+      div.innerHTML = `我已在此等候你 ${ages}`;
+    }
+    var div = document.createElement("div");
+    //插入到copyright之后
+    var copyright = document.querySelector(".copyright");
+    document.querySelector(".footer-inner").insertBefore(div, copyright.nextSibling);
+    timer();
+    setInterval("timer()",1000)
+  </script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span class="site-uv">
+        我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+      </span>
+    <span class="post-meta-divider">|</span>
+    <span class="site-pv">
+     历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+  <script>
+  function leancloudSelector(url) {
+    return document.getElementById(url).querySelector('.leancloud-visitors-count');
+  }
+  if (CONFIG.page.isPost) {
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = visitors.getAttribute('id').trim();
+      var title = visitors.getAttribute('data-flag-title').trim();
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .then(response => response.json())
+              .then(() => {
+                leancloudSelector(url).innerText = counter.time + 1;
+              })
+              .catch(error => {
+                console.log('Failed to save visitor count', error);
+              })
+          } else {
+              Counter('post', '/classes/Counter', { title: title, url: url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.log('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.log('LeanCloud Counter Error', error);
+        });
+    }
+  } else {
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return element.getAttribute('id').trim();
+      });
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url: { '$in': entries } })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length === 0) {
+            document.querySelectorAll('.leancloud_visitors .leancloud-visitors-count').forEach(element => {
+              element.innerText = 0;
+            });
+            return;
+          }
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.url;
+            var time = item.time;
+            leancloudSelector(url).innerText = time;
+          }
+          for (var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = leancloudSelector(url);
+            if (element.innerText == '') {
+              element.innerText = 0;
+            }
+          }
+        })
+        .catch(error => {
+          console.log('LeanCloud Counter Error', error);
+        });
+    }
+  }
+
+  fetch('https://app-router.leancloud.cn/2/route?appId=EPH6rPR1jvC6S1Lm0xInuQs9-gzGzoHsz')
+    .then(response => response.json())
+    .then(({ api_server }) => {
+      var Counter = (method, url, data) => {
+        return fetch(`https://${api_server}/1.1${url}`, {
+          method: method,
+          headers: {
+            'X-LC-Id': 'EPH6rPR1jvC6S1Lm0xInuQs9-gzGzoHsz',
+            'X-LC-Key': 'CBYfDMAojnLkAoHwdWbPY5Bp',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        const localhost = /http:\/\/(localhost|127.0.0.1|0.0.0.0)/;
+        if (localhost.test(document.URL)) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color="0,0,0" opacity="0.5" zindex="-1" count="150" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '6230713a4391ba4c407f',
+      clientSecret: 'f85b63803056aaa707d6a745926c66445bde3a26',
+      repo: 'zhihuya188.github.io',
+      owner: 'zhihuya188',
+      admin: ['zhihuya188'],
+      id: '66947ae2828f61df929ea2b025b36570',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+
+</body>
+</html>
