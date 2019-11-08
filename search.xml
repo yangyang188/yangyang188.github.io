@@ -1,6 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>centos7使用笔记</title>
+    <url>/archives/23cf4bf6/</url>
+    <content><![CDATA[<div class="note default">
+            <p>本文主要记录了centos7一些基本使用，包括换源，创建超级用户，安装sqlite3，centos安装python3，virtualenv等</p>
+          </div>
+<a id="more"></a>
+<h2 id="centos"><a href="#centos" class="headerlink" title="centos"></a>centos</h2><h3 id="centos命令"><a href="#centos命令" class="headerlink" title="centos命令"></a>centos命令</h3><figure class="highlight vala"><table><tr><td class="code"><pre><span class="line"><span class="meta"># 查看本机ip</span></span><br><span class="line">ifconfig</span><br></pre></td></tr></table></figure>
+<h3 id="CentOS7-换源"><a href="#CentOS7-换源" class="headerlink" title="CentOS7 换源"></a>CentOS7 换源</h3><ol>
+<li>备份</li>
+</ol>
+<p><code>mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup</code></p>
+<ol>
+<li>下载新的CentOS-Base.repo 到/etc/yum.repos.d/</li>
+</ol>
+<p><code>wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</code></p>
+<p>或者</p>
+<p><code>curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</code></p>
+<ol>
+<li><p>之后运行<code>yum makecache</code>生成缓存</p>
+</li>
+<li><p>其他<br>非阿里云ECS用户会出现 <code>Couldn&#39;t resolve host &#39;mirrors.cloud.aliyuncs.com&#39;</code> 信息，不影响使用。用户也可自行修改相关配置: eg:</p>
+</li>
+</ol>
+<p><code>sed -i -e &#39;/mirrors.cloud.aliyuncs.com/d&#39; -e &#39;/mirrors.aliyuncs.com/d&#39; /etc/yum.repos.d/CentOS-Base.re</code></p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 运行以下命令生成缓存</span></span><br><span class="line"><span class="attr">yum</span> <span class="string">clean all</span></span><br><span class="line"><span class="attr">yum</span> <span class="string">makecache</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新</span></span><br><span class="line"><span class="attr">yum</span> <span class="string">update</span></span><br><span class="line"><span class="attr">yum</span> <span class="string">upgrade</span></span><br></pre></td></tr></table></figure>
+<h3 id="创建超级用户"><a href="#创建超级用户" class="headerlink" title="创建超级用户"></a>创建超级用户</h3><figure class="highlight elixir"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在 root 用户下运行这条命令创建一个新用户，zhangly 是用户名</span></span><br><span class="line">root<span class="variable">@server</span><span class="symbol">:~</span><span class="comment"># adduser zhangly</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为新用户设置密码</span></span><br><span class="line"><span class="comment"># 注意在输密码的时候不会有字符显示，不要以为键盘坏了，正常输入即可</span></span><br><span class="line">root<span class="variable">@server</span><span class="symbol">:~</span><span class="comment"># passwd zhangly</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把新创建的用户加入超级权限组</span></span><br><span class="line">root<span class="variable">@server</span><span class="symbol">:~</span><span class="comment"># usermod -aG wheel zhangly</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 切换到创建的新用户</span></span><br><span class="line">root<span class="variable">@server</span><span class="symbol">:~</span><span class="comment"># su - zhangly</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 切换成功，@符号前面已经是新用户名而不是 root 了</span></span><br><span class="line">zhangly<span class="variable">@server</span><span class="symbol">:</span>$</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新一下系统</span></span><br><span class="line">zhangly<span class="variable">@server</span><span class="symbol">:</span><span class="variable">$ </span>sudo yum update</span><br><span class="line">zhangly<span class="variable">@server</span><span class="symbol">:</span><span class="variable">$ </span>sudo yum upgrade</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装gcc</span></span><br><span class="line">root<span class="variable">@server</span><span class="symbol">:~</span><span class="comment"># yum -y install gcc</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装sqlite3"><a href="#安装sqlite3" class="headerlink" title="安装sqlite3"></a>安装sqlite3</h3><figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"># 查看版本</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ sqlite3 --version</span><br><span class="line"># sqlite 的官方下载地址: https:<span class="comment">//sqlite.org/download.html</span></span><br><span class="line"># 创建 src 目录并进到这个目录</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ mkdir -p ~/src</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ cd ~/src</span><br><span class="line"></span><br><span class="line"># 下载 sqlite3 源码并解压安装</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ wget https:<span class="comment">//sqlite.org/2019/sqlite-autoconf-3290000.tar.gz</span></span><br><span class="line"><span class="symbol">zhangly@</span>server:$ tar zxvf sqlite-<span class="built_in">auto</span>conf<span class="number">-3290000.</span>tar.gz</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ cd sqlite-<span class="built_in">auto</span>conf<span class="number">-3290000</span></span><br><span class="line"><span class="symbol">zhangly@</span>server:$ ./configure</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ make</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ sudo make install</span><br><span class="line"></span><br><span class="line"># 重启</span><br><span class="line"><span class="symbol">zhangly@</span>server:$ sudo init <span class="number">6</span></span><br></pre></td></tr></table></figure>
+<h3 id="centos安装python3"><a href="#centos安装python3" class="headerlink" title="centos安装python3"></a>centos安装python3</h3><ol>
+<li>安装可能的依赖：</li>
+</ol>
+<figure class="highlight mipsasm"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 首先安装可能的依赖：</span></span><br><span class="line">sudo yum <span class="keyword">install </span>-y openssl-devel <span class="keyword">bzip2-devel </span>expat-devel gdbm-devel readline-devel sqlite-devel</span><br></pre></td></tr></table></figure>
+<ol>
+<li>下载 Python 3.6.4 的源码并解压：</li>
+</ol>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"># 然后下载 Python <span class="number">3.6</span><span class="number">.4</span> 的源码并解压：</span><br><span class="line">cd ~/src</span><br><span class="line">wget https:<span class="comment">//www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz</span></span><br><span class="line">tar -zxvf Python<span class="number">-3.6</span><span class="number">.4</span>.tgz</span><br></pre></td></tr></table></figure>
+<ol>
+<li>编译安装：</li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 最后编译安装：</span></span><br><span class="line">cd Python-3.6.4</span><br><span class="line">./configure <span class="attribute">LD_RUN_PATH</span>=/usr/local/lib <span class="attribute">LDFLAGS</span>=<span class="string">"-L/usr/local/lib"</span> <span class="attribute">CPPFLAGS</span>=<span class="string">"-I/usr/local/include"</span></span><br><span class="line">make <span class="attribute">LD_RUN_PATH</span>=/usr/local/lib</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<ol>
+<li>更新pip</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 更新pip  --user</span></span><br><span class="line">pip <span class="keyword">install</span> <span class="comment">--upgrade pip</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 升级pip出现的错误解决</span></span><br><span class="line">yangyang@ubuntu16-s:~$ pip</span><br><span class="line">Traceback (most recent <span class="keyword">call</span> <span class="keyword">last</span>):</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/bin/pip"</span>, line <span class="number">9</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    <span class="keyword">from</span> pip <span class="keyword">import</span> <span class="keyword">main</span></span><br><span class="line">ImportError: cannot <span class="keyword">import</span> <span class="keyword">name</span> <span class="keyword">main</span></span><br><span class="line"></span><br><span class="line">sudo vim /usr/<span class="keyword">bin</span>/pip</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将原来的</span></span><br><span class="line"><span class="keyword">from</span> pip <span class="keyword">import</span> <span class="keyword">main</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    sys.exit(<span class="keyword">main</span>())</span><br><span class="line"><span class="comment"># 改后的</span></span><br><span class="line"><span class="keyword">from</span> pip <span class="keyword">import</span> __main__</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    sys.exit(__main__._main())</span><br></pre></td></tr></table></figure>
+<h3 id="centos安装virtualenv"><a href="#centos安装virtualenv" class="headerlink" title="centos安装virtualenv"></a>centos安装<code>virtualenv</code></h3><ol>
+<li>安装包</li>
+</ol>
+<figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">sudo pip3 <span class="keyword">install</span> virtualenv <span class="comment"># 安装虚拟环境</span></span><br><span class="line">sudo pip3 <span class="keyword">install</span> virtualenvwrapper  <span class="comment"># 虚拟环境扩展包</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>配置文件<code>.bashrc</code></li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 配置文件.bashrc</span></span><br><span class="line"><span class="comment"># 根据自己安装的路径填写 查找安装位置 whereis python3.6 | whereis virtualenvwrapper</span></span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">WORKON_HOME</span>=<span class="variable">$HOME</span>/.virtualenvs</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">VIRTUALENVWRAPPER_PYTHON</span>=/usr/bin/python3.6</span><br><span class="line">source /usr/local/bin/virtualenvwrapper.sh</span><br></pre></td></tr></table></figure>
+<ol>
+<li>使配置文件生效</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使配置文件生效</span></span><br><span class="line"><span class="built_in">source</span> .bashrc</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>常用操作</p>
+</blockquote>
+<figure class="highlight vala"><table><tr><td class="code"><pre><span class="line"><span class="meta"># 创建虚拟环境</span></span><br><span class="line">mkvirtualenv -p python3  # 虚拟环境名称</span><br><span class="line"></span><br><span class="line"><span class="meta"># 例：</span></span><br><span class="line">mkvirtualenv -p python3 py_django</span><br><span class="line"></span><br><span class="line"><span class="meta"># 退出虚拟环境</span></span><br><span class="line">deactivate</span><br><span class="line"></span><br><span class="line"><span class="meta"># 进入虚拟环境</span></span><br><span class="line"><span class="meta"># 提示：workon后面有个空格，再按两次tab键。</span></span><br><span class="line">workon 两次tab键</span><br></pre></td></tr></table></figure>
+<h3 id="虚拟机centos7共享文件夹"><a href="#虚拟机centos7共享文件夹" class="headerlink" title="虚拟机centos7共享文件夹"></a>虚拟机centos7共享文件夹</h3><blockquote>
+<p>在root用户下</p>
+</blockquote>
+<ol>
+<li>重新安装缺失的组件</li>
+</ol>
+<p><code>yum install gcc</code></p>
+<p><code>yum install kernel-devel</code></p>
+<ol>
+<li>更新刚安装的组件：</li>
+</ol>
+<p><code>yum update gcc -y</code></p>
+<p><code>yum update kernel -y</code></p>
+<ol>
+<li>重启：</li>
+</ol>
+<p><code>init 6</code></p>
+<ol>
+<li>重新安装<code>VMware Tools</code></li>
+</ol>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line">tar -zxvf VMwareTools<span class="number">-10.2</span><span class="number">.0</span><span class="number">-7259539.</span>tar.gz</span><br><span class="line">cd vmware-tools-distrib</span><br><span class="line">./vmware-install.pl</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>共享文件夹位置在(<code>/mnt/hgfs/xx</code>)</p>
+</blockquote>
+<hr>]]></content>
+      <categories>
+        <category>专业</category>
+        <category>Linux</category>
+        <category>centos</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>centos</tag>
+        <tag>python</tag>
+        <tag>sqlite3</tag>
+        <tag>virtualenv</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>无法重来的一生</title>
     <url>/archives/e3d22906/</url>
     <content><![CDATA[<div class="note default">
